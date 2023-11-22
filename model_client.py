@@ -2,27 +2,35 @@ import json
 import streamlit as st
 import requests
 
+# URL del servidor que proporciona el servicio de predicción
+SERVER_URL = 'https://linear-model-service-babyguma.cloud.okteto.net/v1/models/linear-model:predict'
 
-SERVER_URL = 'https://linear-model-service-ivanavila1224.cloud.okteto.net/v1/models/linear-model:predict'
-
-def make_prediction(inputs):
-   
-    predict_request = {'instances': [inputs]}
+# Función para realizar la predicción
+def make_prediction(advertising_expenses):
+    predict_request = {'instances': [advertising_expenses]}
     response = requests.post(SERVER_URL, json=predict_request)
     response.raise_for_status()
     prediction = response.json()
     return prediction
 
+# Función principal
 def main():
-    st.title('Estimador de Tiempo de Desarrollo')
+    st.title('Calculador de Ventas de Proyectos')
 
-   
-    code_size = st.number_input('Ingrese el numero de lineas de codigo:', min_value=0.0, step=1.0)
+    # Entrada: Gasto en publicidad
+    advertising_expenses = st.number_input('Ingrese numero de lineas de codigo:', min_value=0.0, step=1.0)
 
-   
-    if st.button('Predecir'):
-        prediction = make_prediction([code_size])
-        st.write(f'Tiempo estimado de desarrollo para un tamaño de código en horas de {code_size}: {prediction["predictions"][0][0]}')
+    # Botón para realizar la predicción
+    if st.button('Calcular'):
+        # Hacer la predicción utilizando el modelo
+        prediction = make_prediction([advertising_expenses])
+        
+        # Asegurarse de que el resultado no sea negativo
+        estimated_sales = max(0, prediction["predictions"][0][0])
 
+        # Mostrar el resultado en la interfaz de usuario
+        st.write(f'Estimación de Ventas: {estimated_sales}')
+
+# Verificar si el script se ejecuta directamente
 if __name__ == '__main__':
     main()
